@@ -1,0 +1,12 @@
+analysis/*/results*/
+analysis/*/logs/
+analysis/*/log/
+analysis/gwas/tmp*
+*.pdf
+*.png
+*.DS_Store
+*.txt
+*nohup.*
+*/sandbox/*
+sandbox*
+lib/

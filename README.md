@@ -1,8 +1,8 @@
-## Recombination Calling from PGT-A Data
+# Recombination Calling from PGT-A Data
 
 This pipeline implements the procedures used for calling recombination events in PGT-A datasets 
 
-### Installation
+## Installation
 
 In order to install the pipeline, you can use a viable `conda` distribution and call the following steps:
 
@@ -14,7 +14,7 @@ conda env create -f env.yaml
 conda activate recombination_pgta 
 ```
 
-### Pipeline 
+## Pipeline 
 
 Briefly - the pipeline proceeds according to the following steps:
 
@@ -22,6 +22,11 @@ Briefly - the pipeline proceeds according to the following steps:
 2. 
 3. 
 
-### Contact
+### Configuration
+
+The configuration of the pipeline is a critical step as it allows to specify the  
+
+
+## Contact
 
 For any questions - please either submit an issue or contact @aabiddanda

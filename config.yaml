@@ -1,0 +1,15 @@
+families:
+  family1:
+    maternal: "A"
+    paternal: "B"
+    embryos:
+      embryo1: "data/"
+      embryo2: "data/"
+      embryo3: "data/"
+  family2:
+    maternal: "A2"
+    paternal: "B2"
+    embryos:
+      embryo1: "data/"
+      embryo2: "data/"
+      embryo3: "data/"
