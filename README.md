@@ -1,6 +1,7 @@
 # Recombination Calling from PGT-A Data
 
-This pipeline implements the procedures used for calling recombination events in PGT-A datasets 
+This pipeline implements the procedures used for calling recombination events in PGT-A datasets. This is a subset of routines used in: https://github.com/mccoy-lab/natera_recomb
+
 
 ## Installation
 
@@ -29,16 +30,26 @@ Briefly - the pipeline proceeds according to the following steps per-chromosome:
 The configuration of the pipeline is a critical step as it allows the user to specify family structure for analysis, which have example blocks like: 
 
 ```
-family1:
-    maternal: "mother1"
-    paternal: "father1"
-    embryos:
-      embryo1: "data/embryo1.tsv.gz"
-      embryo2: "data/embryo2.tsv.gz"
-      embryo3: "data/embryo3.tsv.gz"
+families:
+    family1:
+      maternal:
+        id: "B"
+        path: "data/family1/maternal.autosomes.tsv.gz"
+      paternal:
+        id: "A"
+        path: "data/family1/paternal.autosomes.tsv.gz"
+      embryos:
+        embryo1: "data/family1/embryos/embryo0.autosomes.tsv.gz"
+        embryo2: "data/family1/embryos/embryo1.autosomes.tsv.gz"
+        embryo3: "data/family1/embryos/embryo2.autosomes.tsv.gz"
+        embryo4: "data/family1/embryos/embryo3.autosomes.tsv.gz"
 ```
 
+NOTE: the names "embryo1" can be interchanged with other names (e.g. array ID) in case that might help with downstream intersection with metadata. 
+
 You can see examples of a data directory here: https://www.dropbox.com/scl/fi/ncf7b2i9kx56emoeyijaf/data.tar.gz?rlkey=iv70iw56kmdpktk7v19dn1ehr&dl=0
+
+The parental files contain parental haplotypes (though it is not entirely necessary to phase the parents), and the embryo data contain chromosome, position, and B-allele frequency as tab-separated values (TSV) files.
 
 ### Running 
 
@@ -52,6 +63,18 @@ The `-j 1` flag specifies that there will be 4 parallel jobs running at a time. 
 
 In the example data and configuration setup - the full pipeline for two families takes approximately 15 minutes on a reasonable laptop computer. 
 
+If the pipeline finishes, recombination calls per-family will be set as ``
+
+
+## Citation 
+
+If you use any of the code here, please cite the following manuscript: 
+
+```
+Common variation in meiosis genes shapes human recombination phenotypes and aneuploidy risk
+Sara A. Carioscia, Arjun Biddanda, Margaret R. Starostik, Xiaona Tang, Eva R. Hoffmann, Zachary P. Demko, Rajiv C. McCoy
+medRxiv 2025.04.02.25325097; doi: https://doi.org/10.1101/2025.04.02.25325097
+```
 ## Contact
 
 For any questions - please either submit an issue or contact @aabiddanda
