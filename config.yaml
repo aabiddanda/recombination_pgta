@@ -1,15 +1,24 @@
 families:
   family1:
-    maternal: "A"
-    paternal: "B"
+    maternal:
+      id: "B"
+      path: "data/family1/maternal.autosomes.tsv.gz"
+    paternal:
+      id: "A"
+      path: "data/family1/paternal.autosomes.tsv.gz"
     embryos:
-      embryo1: "data/"
-      embryo2: "data/"
-      embryo3: "data/"
+      embryo1: "data/family1/embryos/embryo0.autosomes.tsv.gz"
+      embryo2: "data/family1/embryos/embryo1.autosomes.tsv.gz"
+      embryo3: "data/family1/embryos/embryo2.autosomes.tsv.gz"
+      embryo4: "data/family1/embryos/embryo3.autosomes.tsv.gz"
   family2:
-    maternal: "A2"
-    paternal: "B2"
+    maternal: 
+      id: "A2"
+      path: "data/family2/maternal.autosomes.tsv.gz"
+    paternal: 
+      id: "B2"
+      path: "data/family2/paternal.autosomes.tsv.gz"
     embryos:
-      embryo1: "data/"
-      embryo2: "data/"
-      embryo3: "data/"
+      embryo1: "data/family2/embryos/embryo1.autosomes.tsv.gz"
+      embryo2: "data/family2/embryos/embryo2.autosomes.tsv.gz"
+      embryo3: "data/family2/embryos/embryo3.autosomes.tsv.gz"
