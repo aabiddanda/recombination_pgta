@@ -4,25 +4,31 @@ import sys
 from pathlib import Path
 
 import numpy as np
-import pandas as pd
+import polars as pl
 from karyohmm import MetaHMM, PhaseCorrect, RecombEst
 from tqdm import tqdm
 from utils import *
 
 if __name__ == "__main__":
     # Read in the input data and params ...
-    aneuploidy_df = pd.read_csv(snakemake.input["aneuploidy_calls"], sep="\t")
+    aneuploidy_df = pl.concat(
+        [
+            pl.read_csv(fp, separator="\t", null_values=["NA"])
+            for fp in snakemake.input["aneuploidy_calls"]
+        ]
+    )
     hmm_dis = MetaHMM(disomy=True)
     family_data = load_baf_data(snakemake.input["baf_pkl"])
     hmm_data = load_baf_data(snakemake.input["hmm_pkl"])
     names = [k for k in family_data.keys()]
     recomb_dict = {}
     lines = []
-    for c in tqdm(snakemake.params["chroms"]):
+    chroms = aneuploidy_df["chrom"].unique().to_numpy()
+    for c in tqdm(chroms):
         cur_names = euploid_per_chrom(
             aneuploidy_df,
-            mother=snakemake.wildcards["mother"],
-            father=snakemake.wildcards["father"],
+            mother=snakemake.params["mother_id"],
+            father=snakemake.params["father_id"],
             names=names,
             chrom=c,
             pp_thresh=snakemake.params["ppThresh"],
@@ -43,8 +49,8 @@ if __name__ == "__main__":
             if snakemake.params["use_prev_params"]:
                 pi0_est_acc, sigma_est_acc = extract_parameters(
                     aneuploidy_df,
-                    mother=snakemake.wildcards["mother"],
-                    father=snakemake.wildcards["father"],
+                    mother=snakemake.params["mother_id"],
+                    father=snakemake.params["father_id"],
                     names=real_names,
                     chrom=c,
                 )
@@ -99,7 +105,7 @@ if __name__ == "__main__":
                     geno_qual_left = posterior_disomy[pos == left_pos][0]
                     geno_qual_right = posterior_disomy[pos == right_pos][0]
                     lines.append(
-                        f'{snakemake.wildcards["mother"]}\t{snakemake.wildcards["father"]}\t{real_names[i]}\t{c}\tmaternal\t{left_pos}\t{rec_pos}\t{right_pos}\t{geno_qual_left}\t{geno_qual_right}\t{pi0_ests[i]}\t{sigma_ests[i]}\t{nsibs}\t{mat_rec_support[j]}\t{pos.size}\n'
+                        f'{snakemake.params["mother_id"]}\t{snakemake.params["father_id"]}\t{real_names[i]}\t{c}\tmaternal\t{left_pos}\t{rec_pos}\t{right_pos}\t{geno_qual_left}\t{geno_qual_right}\t{pi0_ests[i]}\t{sigma_ests[i]}\t{nsibs}\t{mat_rec_support[j]}\t{pos.size}\n'
                     )
                 for j, p in enumerate(pat_rec):
                     left_pos, right_pos = p
@@ -107,24 +113,24 @@ if __name__ == "__main__":
                     geno_qual_left = posterior_disomy[pos == left_pos][0]
                     geno_qual_right = posterior_disomy[pos == right_pos][0]
                     lines.append(
-                        f'{snakemake.wildcards["mother"]}\t{snakemake.wildcards["father"]}\t{real_names[i]}\t{c}\tpaternal\t{left_pos}\t{rec_pos}\t{right_pos}\t{geno_qual_left}\t{geno_qual_right}\t{pi0_ests[i]}\t{sigma_ests[i]}\t{nsibs}\t{pat_rec_support[j]}\t{pos.size}\n'
+                        f'{snakemake.params["mother_id"]}\t{snakemake.params["father_id"]}\t{real_names[i]}\t{c}\tpaternal\t{left_pos}\t{rec_pos}\t{right_pos}\t{geno_qual_left}\t{geno_qual_right}\t{pi0_ests[i]}\t{sigma_ests[i]}\t{nsibs}\t{pat_rec_support[j]}\t{pos.size}\n'
                     )
                 # NOTE: Cases of no crossover recombination detected as well ...
                 if not mat_rec:
                     lines.append(
-                        f'{snakemake.wildcards["mother"]}\t{snakemake.wildcards["father"]}\t{real_names[i]}\t{c}\tmaternal\tNA\tNA\tNA\tNA\tNA\t{pi0_ests[i]}\t{sigma_ests[i]}\t{nsibs}\t0\t{pos.size}\n'
+                        f'{snakemake.params["mother_id"]}\t{snakemake.params["father_id"]}\t{real_names[i]}\t{c}\tmaternal\tNA\tNA\tNA\tNA\tNA\t{pi0_ests[i]}\t{sigma_ests[i]}\t{nsibs}\t0\t{pos.size}\n'
                     )
                 if not pat_rec:
                     lines.append(
-                        f'{snakemake.wildcards["mother"]}\t{snakemake.wildcards["father"]}\t{real_names[i]}\t{c}\tpaternal\tNA\tNA\tNA\tNA\tNA\t{pi0_ests[i]}\t{sigma_ests[i]}\t{nsibs}\t0\t{pos.size}\n'
+                        f'{snakemake.params["mother_id"]}\t{snakemake.params["father_id"]}\t{real_names[i]}\t{c}\tpaternal\tNA\tNA\tNA\tNA\tNA\t{pi0_ests[i]}\t{sigma_ests[i]}\t{nsibs}\t0\t{pos.size}\n'
                     )
         else:
             for i in range(nsibs):
                 lines.append(
-                    f'{snakemake.wildcards["mother"]}\t{snakemake.wildcards["father"]}\t{real_names[i]}\t{c}\tmaternal\tNA\tNA\tNA\tNA\tNA\t{pi0_ests[i]}\t{sigma_ests[i]}\t{nsibs}\t0\t{pos.size}\n'
+                    f'{snakemake.params["mother_id"]}\t{snakemake.params["father_id"]}\t{real_names[i]}\t{c}\tmaternal\tNA\tNA\tNA\tNA\tNA\t{pi0_ests[i]}\t{sigma_ests[i]}\t{nsibs}\t0\t{pos.size}\n'
                 )
                 lines.append(
-                    f'{snakemake.wildcards["mother"]}\t{snakemake.wildcards["father"]}\t{real_names[i]}\t{c}\tpaternal\tNA\tNA\tNA\tNA\tNA\t{pi0_ests[i]}\t{sigma_ests[i]}\t{nsibs}\t0\t{pos.size}\n'
+                    f'{snakemake.params["mother_id"]}\t{snakemake.params["father_id"]}\t{real_names[i]}\t{c}\tpaternal\tNA\tNA\tNA\tNA\tNA\t{pi0_ests[i]}\t{sigma_ests[i]}\t{nsibs}\t0\t{pos.size}\n'
                 )
     # Write out crossover location output here ...
     with open(snakemake.output["est_recomb"], "w") as out:

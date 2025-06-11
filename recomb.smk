@@ -19,13 +19,10 @@ localrules:
 
 rule all:
     input:
-        [
-            [
-                f"results/aneuploidy_calls/{f}/{e}.aneuploidy.tsv"
-                for e in config["families"][f]["embryos"].keys()
-            ]
-            for f in config["families"].keys()
-        ],
+        expand(
+            "results/recombination_calls/{family}.est_recomb.tsv",
+            family=config["families"].keys(),
+        ),
 
 
 rule preprocess_data:
@@ -117,12 +114,18 @@ rule mendelian_filtering:
             embryo=config["families"][wildcards.family]["embryos"].keys(),
         ),
     output:
-        mendelian_errors="results/mendelian_errors/{family}.mendelian_errors.tsv",
+        mendelian_tsv="results/mendelian_errors/{family}.mendelian_errors.tsv",
     params:
         ppThresh=0.90,
         phaseCorrect=False,
         eps=1e-2,
         err_rate=5e-2,
+        mother_id=lambda wildcards: config["families"][wildcards.family]["maternal"][
+            "id"
+        ],
+        father_id=lambda wildcards: config["families"][wildcards.family]["paternal"][
+            "id"
+        ],
     resources:
         time="00:05:00",
     script:
@@ -140,17 +143,23 @@ rule est_crossover_euploid_chrom_trio_heuristic:
             "results/aneuploidy_calls/{{family}}/{embryo}.hmm.pkl.gz",
             embryo=config["families"][wildcards.family]["embryos"].keys(),
         ),
-        mendelian_errors=rules.mendelian_filtering.output.mendelian_errors,
+        mendelian_errors=rules.mendelian_filtering.output.mendelian_tsv,
         aneuploidy_calls=lambda wildcards: expand(
             "results/aneuploidy_calls/{{family}}/{embryo}.aneuploidy.tsv",
             embryo=config["families"][wildcards.family]["embryos"].keys(),
         ),
     output:
-        est_recomb="results/natera_inference_heuristic/{family}.est_recomb.tsv",
+        est_recomb="results/recombination_calls/{family}.est_recomb.tsv",
     params:
         use_prev_params=True,
         ppThresh=0.90,
         phaseCorrect=True,
+        mother_id=lambda wildcards: config["families"][wildcards.family]["maternal"][
+            "id"
+        ],
+        father_id=lambda wildcards: config["families"][wildcards.family]["paternal"][
+            "id"
+        ],
     resources:
         time="1:00:00",
         mem_mb="10G",

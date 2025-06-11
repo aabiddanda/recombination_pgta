@@ -46,7 +46,7 @@ if __name__ == "__main__":
             "pos": merged_df["pos"].to_numpy(),
             "mat_haps": mat_haps,
             "pat_haps": pat_haps,
-            "aploid": "real_data"
+            "aploid": "real_data",
         }
         meta_dict[c] = chrom_dict
     pickle.dump(meta_dict, gz.open(snakemake.output["baf_pkl"], "wb"))

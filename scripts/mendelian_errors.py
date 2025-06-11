@@ -48,8 +48,9 @@ def err_het_hom(mat_haps, pat_haps, bafs, eps=5e-2):
 if __name__ == "__main__":
     # Load in the input BAF datasets
     family_data = load_baf_data(snakemake.input["baf_pkl"])
-    aneuploidy_df = pl.read_csv(
-        snakemake.input["aneuploidy_calls"], separator="\t", null_values=["NA"]
+    fps = [f for f in snakemake.input["aneuploidy_calls"]]
+    aneuploidy_df = pl.concat(
+        [pl.read_csv(fp, separator="\t", null_values=["NA"]) for fp in fps]
     )
     chroms = aneuploidy_df["chrom"].unique().to_numpy()
     chrom_agg = []
@@ -59,8 +60,8 @@ if __name__ == "__main__":
         # Reading in the current datasets
         euploid_indivs = euploid_per_chrom(
             aneuploidy_df,
-            mother=snakemake.wildcards["mother"],
-            father=snakemake.wildcards["father"],
+            mother=snakemake.params["mother_id"],
+            father=snakemake.params["father_id"],
             names=family_data.keys(),
             chrom=f"{c}",
             pp_thresh=snakemake.params["ppThresh"],

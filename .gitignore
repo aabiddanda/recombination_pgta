@@ -10,3 +10,4 @@ analysis/gwas/tmp*
 */sandbox/*
 sandbox*
 lib/
+results/
