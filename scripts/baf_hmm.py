@@ -7,8 +7,9 @@ from karyohmm import MetaHMM, MosaicEst
 if __name__ == "__main__":
     # Read in the input data and params ...
     data = pickle.load(gz.open(snakemake.input["baf_pkl"], "r"))
+    chroms = data.keys()
     full_chrom_hmm_dict = {}
-    for c in snakemake.params["chroms"]:
+    for c in chroms:
         baf_data = data[c]
         print("Running meta HMM parameter estimation ...", file=sys.stderr)
         n01 = np.nansum((baf_data["baf_embryo"] == 1) | (baf_data["baf_embryo"] == 0))

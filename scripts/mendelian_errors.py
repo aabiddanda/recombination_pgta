@@ -51,10 +51,11 @@ if __name__ == "__main__":
     aneuploidy_df = pl.read_csv(
         snakemake.input["aneuploidy_calls"], separator="\t", null_values=["NA"]
     )
+    chroms = aneuploidy_df["chrom"].unique().to_numpy()
     chrom_agg = []
     pos_agg = []
     prop_err_agg = []
-    for c in snakemake.params["chroms"]:
+    for c in chroms:
         # Reading in the current datasets
         euploid_indivs = euploid_per_chrom(
             aneuploidy_df,
