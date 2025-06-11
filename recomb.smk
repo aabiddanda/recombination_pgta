@@ -60,6 +60,7 @@ rule est_ploidy_and_params:
             "id"
         ],
         child_id=lambda wildcards: wildcards.embryo,
+        unphased=False,
     script:
         "scripts/baf_hmm.py"
 
